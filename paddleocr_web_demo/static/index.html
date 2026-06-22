@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="本地 PaddleOCR 三模式演示">
+  <title>PaddleOCR · 本地智能文档解析</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="PaddleOCR 演示首页">
+      <span class="brand-mark"><i></i><i></i><i></i></span>
+      <span>Paddle<span>OCR</span></span>
+      <small>LOCAL LAB</small>
+    </a>
+    <div class="system-pill" id="systemPill">
+      <span class="status-dot"></span>
+      <span id="systemText">正在连接本地引擎</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow"><span></span> DOCUMENT INTELLIGENCE PLAYGROUND</div>
+      <h1>让文档中的每一个字符<br><em>变得可理解</em></h1>
+      <p>本地运行的 PaddleOCR 3.7 三模式演示。图片与文档只在这台机器上处理。</p>
+      <div class="hero-stats">
+        <div><strong>3</strong><span>识别引擎</span></div>
+        <div><strong>50+</strong><span>语言支持</span></div>
+        <div><strong>LOCAL</strong><span>数据处理</span></div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="section-heading">
+        <div>
+          <span class="step-number">01</span>
+          <h2>选择识别模式</h2>
+        </div>
+        <p>不同模型共享同一块 GPU，切换模式时会自动释放并重新加载。</p>
+      </div>
+
+      <div class="mode-grid" id="modeGrid">
+        <button class="mode-card active" data-mode="ocr" type="button">
+          <span class="mode-icon icon-scan">Aa</span>
+          <span class="mode-copy">
+            <strong>通用文字识别</strong>
+            <small>PP-OCRv6 Medium</small>
+            <span>检测文字位置，输出文本与置信度</span>
+          </span>
+          <span class="mode-check">✓</span>
+        </button>
+        <button class="mode-card" data-mode="structure" type="button">
+          <span class="mode-icon icon-layout">▦</span>
+          <span class="mode-copy">
+            <strong>文档结构解析</strong>
+            <small>PP-StructureV3</small>
+            <span>解析版面、表格、公式与阅读顺序</span>
+          </span>
+          <span class="mode-check">✓</span>
+        </button>
+        <button class="mode-card" data-mode="vl" type="button">
+          <span class="mode-icon icon-spark">✦</span>
+          <span class="mode-copy">
+            <strong>智能视觉解析</strong>
+            <small>PaddleOCR-VL 1.6</small>
+            <span>视觉语言模型理解复杂文档内容</span>
+          </span>
+          <span class="mode-check">✓</span>
+        </button>
+      </div>
+
+      <div class="upload-panel">
+        <div class="section-heading compact">
+          <div>
+            <span class="step-number">02</span>
+            <h2>上传文档</h2>
+          </div>
+          <span class="limit-note" id="limitNote">图片 / PDF · 最大 15MB</span>
+        </div>
+
+        <div class="drop-zone" id="dropZone">
+          <input id="fileInput" type="file" accept=".jpg,.jpeg,.png,.webp,.bmp,.tif,.tiff,.pdf">
+          <div class="upload-idle" id="uploadIdle">
+            <span class="upload-symbol">↥</span>
+            <strong>拖放文件到这里</strong>
+            <p>或点击选择本地图片与 PDF 文档</p>
+            <button class="secondary-button" id="chooseButton" type="button">选择文件</button>
+          </div>
+          <div class="file-preview hidden" id="filePreview">
+            <div class="preview-visual">
+              <img id="previewImage" alt="待处理文件预览">
+              <span id="pdfBadge">PDF</span>
+            </div>
+            <div class="preview-meta">
+              <strong id="fileName"></strong>
+              <span id="fileInfo"></span>
+              <button class="text-button" id="removeFile" type="button">移除文件</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sample-row">
+          <span>没有文件？试试示例</span>
+          <button class="sample-button" data-sample="ocr" type="button">登机牌</button>
+          <button class="sample-button" data-sample="structure" type="button">奖牌表格</button>
+          <button class="sample-button" data-sample="vl" type="button">公式文档</button>
+        </div>
+
+        <button class="primary-button" id="submitButton" type="button" disabled>
+          <span>开始智能解析</span><b>→</b>
+        </button>
+        <p class="error-message hidden" id="errorMessage"></p>
+      </div>
+    </section>
+
+    <section class="processing-card hidden" id="processingCard">
+      <div class="processing-orb"><span></span></div>
+      <div class="processing-copy">
+        <div>
+          <strong id="phaseText">等待处理</strong>
+          <span id="progressText">0%</span>
+        </div>
+        <div class="progress-track"><span id="progressBar"></span></div>
+        <p id="queueText">正在连接 GPU 工作队列…</p>
+      </div>
+      <button class="cancel-button" id="cancelButton" type="button">取消</button>
+    </section>
+
+    <section class="results hidden" id="results">
+      <div class="section-heading">
+        <div>
+          <span class="step-number success">03</span>
+          <h2>解析结果</h2>
+        </div>
+        <div class="result-actions">
+          <button class="secondary-button" id="copyButton" type="button">复制文本</button>
+          <button class="secondary-button" id="newTaskButton" type="button">新建任务</button>
+        </div>
+      </div>
+
+      <div class="metric-grid">
+        <div class="metric"><span>处理耗时</span><strong id="metricTime">—</strong></div>
+        <div class="metric"><span>文档页数</span><strong id="metricPages">—</strong></div>
+        <div class="metric"><span id="metricItemLabel">识别文本</span><strong id="metricItems">—</strong></div>
+        <div class="metric"><span>运行模型</span><strong id="metricModel">—</strong></div>
+      </div>
+
+      <div class="result-shell">
+        <div class="tabs" id="tabs">
+          <button class="active" data-tab="visual" type="button">可视化</button>
+          <button data-tab="content" type="button">识别内容</button>
+          <button data-tab="markdown" type="button">Markdown</button>
+          <button data-tab="json" type="button">原始 JSON</button>
+          <button data-tab="downloads" type="button">下载文件</button>
+        </div>
+
+        <div class="tab-panel active" data-panel="visual">
+          <div class="visual-grid" id="visualGrid"></div>
+          <div class="empty-state hidden" id="visualEmpty">此任务没有生成可视化图片</div>
+        </div>
+        <div class="tab-panel" data-panel="content">
+          <div class="content-list" id="contentList"></div>
+        </div>
+        <div class="tab-panel markdown-body" data-panel="markdown" id="markdownPanel"></div>
+        <div class="tab-panel" data-panel="json">
+          <pre class="json-view" id="jsonView">正在加载 JSON…</pre>
+        </div>
+        <div class="tab-panel" data-panel="downloads">
+          <div class="download-grid" id="downloadGrid"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>PaddleOCR Local Lab</span>
+    <span>文件将在处理完成 30 分钟后自动清理</span>
+  </footer>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
+

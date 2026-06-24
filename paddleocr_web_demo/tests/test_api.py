@@ -74,3 +74,16 @@ def test_markdown_disables_raw_html():
     rendered = _render_markdown("<script>alert(1)</script>\n\n# Safe", "job")
     assert "<script>" not in rendered
     assert "<h1>Safe</h1>" in rendered
+
+
+def test_markdown_disables_data_links():
+    rendered = _render_markdown('[x](data:text/html;base64,PHNjcmlwdD4=)', "job")
+    assert "href=" not in rendered
+
+
+def test_security_headers_include_hardening(tmp_path):
+    with make_client(tmp_path) as client:
+        response = client.get("/api/health")
+        csp = response.headers["content-security-policy"]
+        assert "object-src 'none'" in csp
+        assert "frame-ancestors 'none'" in csp

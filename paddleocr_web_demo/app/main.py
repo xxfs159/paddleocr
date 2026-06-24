@@ -57,6 +57,8 @@ ALLOWED_MARKDOWN_TAGS = {
     "ul",
 }
 
+ALLOWED_MARKDOWN_PROTOCOLS = {"http", "https"}
+
 
 def _client_ip(request: Request) -> str:
     return (
@@ -96,7 +98,7 @@ def _render_markdown(text: str, job_id: str) -> str:
         html,
         tags=ALLOWED_MARKDOWN_TAGS,
         attributes={"a": ["href", "title"], "img": ["src", "alt", "title"]},
-        protocols={"http", "https", "data"},
+        protocols=ALLOWED_MARKDOWN_PROTOCOLS,
         strip=True,
     )
     return clean.replace(
@@ -138,7 +140,8 @@ def create_app(
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; img-src 'self' data: blob:; "
-            "style-src 'self'; script-src 'self'; connect-src 'self'"
+            "style-src 'self'; script-src 'self'; connect-src 'self'; "
+            "object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
         )
         return response
 

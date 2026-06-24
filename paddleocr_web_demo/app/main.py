@@ -96,7 +96,7 @@ def _render_markdown(text: str, job_id: str) -> str:
         html,
         tags=ALLOWED_MARKDOWN_TAGS,
         attributes={"a": ["href", "title"], "img": ["src", "alt", "title"]},
-        protocols={"http", "https", "data"},
+        protocols={"http", "https"},
         strip=True,
     )
     return clean.replace(
@@ -162,8 +162,9 @@ def create_app(
         sample = SAMPLES.get(sample_id)
         if not sample:
             raise HTTPException(404, "示例不存在")
-        path = (config.paddleocr_dir / sample["path"]).resolve()
-        if not path.is_file():
+        root = config.paddleocr_dir.resolve()
+        path = (root / sample["path"]).resolve()
+        if root not in path.parents or not path.is_file():
             raise HTTPException(404, "本地 PaddleOCR 示例文件不存在")
         return FileResponse(path, filename=path.name)
 

@@ -80,5 +80,5 @@ See [the demo README](paddleocr_web_demo/README.md) for setup details and operat
 
 ## License
 
-The demo code in this repository is distributed under the included Apache-2.0 license. The PaddleOCR submodule is maintained by PaddlePaddle; see its repository for license and attribution details.
+The demo code in this repository is distributed under the included MIT license. The PaddleOCR submodule is maintained by PaddlePaddle; see its repository for license and attribution details.
 

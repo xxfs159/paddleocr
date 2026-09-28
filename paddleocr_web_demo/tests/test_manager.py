@@ -4,8 +4,8 @@ import time
 
 import pytest
 
-from paddleocr.paddleocr_web_demo.app.config import Settings
-from paddleocr.paddleocr_web_demo.app.manager import JobManager, QueueFullError
+from app.config import Settings
+from app.manager import JobManager, QueueFullError
 
 
 @pytest.mark.asyncio
@@ -31,4 +31,5 @@ def test_orphan_cleanup(tmp_path):
     os.utime(old, (past, past))
     manager._remove_orphaned_directories()
     assert not old.exists()
+
 

@@ -6,7 +6,7 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from paddleocr.paddleocr_web_demo.app.inference import create_pipeline, run_inference
+from app.inference import create_pipeline, run_inference
 
 
 SAMPLES = {
@@ -36,7 +36,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--paddleocr-dir",
-        default="/home/lyc/PaddleOCR",
+        default=str(Path(__file__).resolve().parents[2] / "PaddleOCR"),
         help="Path to the PaddleOCR source repository",
     )
     args = parser.parse_args()
@@ -68,4 +68,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 

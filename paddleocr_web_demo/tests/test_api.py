@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from PIL import Image
 
 from app.config import Settings
-from app.main import _render_markdown, create_app
+from app.main import SAMPLES, _render_markdown, create_app
 from app.manager import FakeJobManager
 
 
@@ -74,4 +74,37 @@ def test_markdown_disables_raw_html():
     rendered = _render_markdown("<script>alert(1)</script>\n\n# Safe", "job")
     assert "<script>" not in rendered
     assert "<h1>Safe</h1>" in rendered
+
+
+def test_markdown_disallows_data_urls():
+    rendered = _render_markdown(
+        "[click](data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==)",
+        "job",
+    )
+    assert 'href="data:' not in rendered
+
+
+def test_sample_file_blocks_paths_outside_paddleocr_dir(tmp_path, monkeypatch):
+    outside = tmp_path.parent / f"{tmp_path.name}-secret.txt"
+    outside.write_text("secret", encoding="utf-8")
+    monkeypatch.setitem(
+        SAMPLES,
+        "ocr",
+        {"name": "恶意样本", "path": f"../{outside.name}"},
+    )
+
+    with make_client(tmp_path) as client:
+        response = client.get("/api/samples/ocr")
+
+    assert response.status_code == 404
+
+
+def test_security_headers_include_hardening(tmp_path):
+    with make_client(tmp_path) as client:
+        response = client.get("/api/health")
+
+    csp = response.headers["content-security-policy"]
+    assert "object-src 'none'" in csp
+    assert "base-uri 'none'" in csp
+    assert "frame-ancestors 'none'" in csp
 

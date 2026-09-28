@@ -2,7 +2,7 @@ import json
 
 from PIL import Image
 
-from paddleocr.paddleocr_web_demo.app.inference import (
+from app.inference import (
     _extract_document_page,
     _extract_ocr_page,
     json_safe,
@@ -80,3 +80,4 @@ def test_run_inference_writes_artifacts(tmp_path):
     saved = json.loads((tmp_path / "artifacts" / "result.json").read_text())
     assert saved["pages"][0]["res"]["rec_texts"] == ["hello"]
     assert phases[-1][1] == 95
+

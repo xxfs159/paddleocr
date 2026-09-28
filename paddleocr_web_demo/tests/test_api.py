@@ -5,9 +5,9 @@ import io
 from fastapi.testclient import TestClient
 from PIL import Image
 
-from paddleocr.paddleocr_web_demo.app.config import Settings
-from paddleocr.paddleocr_web_demo.app.main import _render_markdown, create_app
-from paddleocr.paddleocr_web_demo.app.manager import FakeJobManager
+from app.config import Settings
+from app.main import _render_markdown, create_app
+from app.manager import FakeJobManager
 
 
 def png_bytes() -> bytes:
@@ -74,3 +74,4 @@ def test_markdown_disables_raw_html():
     rendered = _render_markdown("<script>alert(1)</script>\n\n# Safe", "job")
     assert "<script>" not in rendered
     assert "<h1>Safe</h1>" in rendered
+

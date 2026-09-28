@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PADDLEOCR_DIR="${PADDLEOCR_DIR:-/home/lyc/PaddleOCR}"
+PADDLEOCR_DIR="${PADDLEOCR_DIR:-${ROOT_DIR}/../PaddleOCR}"
 MODE="${1:-all}"
 
 if [[ ! -x "${ROOT_DIR}/.venv/bin/python" ]]; then
@@ -39,3 +39,4 @@ if [[ "${MODE}" == "all" ]]; then
 else
   run_mode "${MODE}"
 fi
+

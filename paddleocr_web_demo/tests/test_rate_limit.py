@@ -1,4 +1,4 @@
-from paddleocr.paddleocr_web_demo.app.rate_limit import SlidingWindowRateLimiter
+from app.rate_limit import SlidingWindowRateLimiter
 
 
 def test_sliding_window_limit_and_expiry():
@@ -7,4 +7,5 @@ def test_sliding_window_limit_and_expiry():
     assert limiter.allow("client", now=1)
     assert not limiter.allow("client", now=2)
     assert limiter.allow("client", now=11)
+
 

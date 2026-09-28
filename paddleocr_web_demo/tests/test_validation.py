@@ -5,8 +5,8 @@ import io
 import pytest
 from PIL import Image
 
-from paddleocr.paddleocr_web_demo.app.config import Settings
-from paddleocr.paddleocr_web_demo.app.validation import UploadValidationError, validate_upload
+from app.config import Settings
+from app.validation import UploadValidationError, validate_upload
 
 
 def image_bytes(size: tuple[int, int] = (100, 80), fmt: str = "PNG") -> bytes:
@@ -39,4 +39,5 @@ def test_rejects_unsupported_extension(tmp_path):
     config = Settings(data_dir=tmp_path)
     with pytest.raises(UploadValidationError, match="格式"):
         validate_upload("notes.txt", b"hello", "ocr", config)
+
 

@@ -2,11 +2,12 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PADDLEOCR_DIR="${PADDLEOCR_DIR:-/home/lyc/PaddleOCR}"
+PADDLEOCR_DIR="${PADDLEOCR_DIR:-${ROOT_DIR}/../PaddleOCR}"
 VENV_DIR="${VENV_DIR:-${ROOT_DIR}/.venv}"
 
 if [[ ! -d "${PADDLEOCR_DIR}" ]]; then
   echo "PaddleOCR repository not found: ${PADDLEOCR_DIR}" >&2
+  echo "Initialize the submodule with: git -C \"${ROOT_DIR}/..\" submodule update --init --recursive" >&2
   exit 1
 fi
 
@@ -49,3 +50,4 @@ echo
 echo "Setup complete."
 echo "Preload models: ${ROOT_DIR}/preload_models.sh"
 echo "Start locally:  ${ROOT_DIR}/run_local.sh"
+

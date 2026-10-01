@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import mimetypes
 import subprocess
 from contextlib import asynccontextmanager
@@ -57,6 +58,9 @@ ALLOWED_MARKDOWN_TAGS = {
     "ul",
 }
 
+# Explicit schemes are restricted; relative URLs and fragments remain supported.
+ALLOWED_MARKDOWN_PROTOCOLS = {"http", "https"}
+
 
 def _client_ip(request: Request) -> str:
     return (
@@ -96,7 +100,7 @@ def _render_markdown(text: str, job_id: str) -> str:
         html,
         tags=ALLOWED_MARKDOWN_TAGS,
         attributes={"a": ["href", "title"], "img": ["src", "alt", "title"]},
-        protocols={"http", "https"},
+        protocols=ALLOWED_MARKDOWN_PROTOCOLS,
         strip=True,
     )
     return clean.replace(
@@ -138,7 +142,8 @@ def create_app(
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; img-src 'self' data: blob:; "
-            "style-src 'self'; script-src 'self'; connect-src 'self'"
+            "style-src 'self'; script-src 'self'; connect-src 'self'; "
+            "object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
         )
         return response
 
@@ -162,9 +167,14 @@ def create_app(
         sample = SAMPLES.get(sample_id)
         if not sample:
             raise HTTPException(404, "示例不存在")
-        root = config.paddleocr_dir.resolve()
-        path = (root / sample["path"]).resolve()
-        if root not in path.parents or not path.is_file():
+        try:
+            root = config.paddleocr_dir.resolve()
+            path = (root / sample["path"]).resolve()
+            valid_file = root in path.parents and path.is_file()
+        except (OSError, RuntimeError):
+            logging.getLogger(__name__).warning("Sample path resolution failed", exc_info=True)
+            valid_file = False
+        if not valid_file:
             raise HTTPException(404, "本地 PaddleOCR 示例文件不存在")
         return FileResponse(path, filename=path.name)
 

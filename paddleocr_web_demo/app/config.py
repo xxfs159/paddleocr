@@ -6,12 +6,13 @@ from pathlib import Path
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+DEFAULT_PADDLEOCR_DIR = BASE_DIR.parent / "PaddleOCR"
 
 
 @dataclass(frozen=True)
 class Settings:
     data_dir: Path = Path(os.getenv("PADDLE_DEMO_DATA_DIR", BASE_DIR / "data"))
-    paddleocr_dir: Path = Path(os.getenv("PADDLEOCR_DIR", "/home/lyc/PaddleOCR"))
+    paddleocr_dir: Path = Path(os.getenv("PADDLEOCR_DIR", DEFAULT_PADDLEOCR_DIR))
     max_upload_bytes: int = 15 * 1024 * 1024
     max_image_pixels: int = 25_000_000
     max_waiting_jobs: int = 3
@@ -30,3 +31,4 @@ class Settings:
 
 
 settings = Settings()
+

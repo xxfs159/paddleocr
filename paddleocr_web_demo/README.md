@@ -92,3 +92,16 @@ pytest
 
 应用入口为 `app.main:app`。本地启动脚本使用单个 Uvicorn worker，因为 GPU 队列和模型工作进程由应用统一管理。
 
+
+## Security boundaries
+
+Markdown permits only explicit `http` and `https` schemes. Relative URLs,
+fragments, and protocol-relative URLs remain supported; local `markdown_assets/`
+images are rewritten to the job artifact endpoint. The page CSP independently
+restricts image loading to same-origin, data, and blob sources.
+
+Sample paths are resolved against the real `PADDLEOCR_DIR` and must name a file
+strictly below it. In-root absolute paths and symlinks are supported; escaping
+paths, missing files, and resolution errors return 404. Keep the sample tree and
+its parent directories unwritable by untrusted users/processes: resolving a path
+before `FileResponse` opens it does not prevent concurrent filesystem replacement.
